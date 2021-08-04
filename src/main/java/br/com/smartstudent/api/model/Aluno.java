@@ -15,4 +15,5 @@ public class Aluno extends AbstractModel{
 
     private String nome;
     private Calendar datanascimento;
+
 }

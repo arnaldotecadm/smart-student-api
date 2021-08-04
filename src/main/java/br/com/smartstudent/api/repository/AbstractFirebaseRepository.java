@@ -5,10 +5,10 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 public class AbstractFirebaseRepository<T extends AbstractModel> {
 
@@ -26,26 +26,34 @@ public class AbstractFirebaseRepository<T extends AbstractModel> {
         return (Class<T>) type.getActualTypeArguments()[0];
     }
 
-    public boolean save(T model) {
+    public T save(T model) {
         String documentId = model.getDocumentId();
         ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).set(model);
-        return true;
+        return model;
     }
 
     public void delete(T model) {
         String documentId = model.getDocumentId();
         ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).delete();
+    }
 
+    public void deleteById(String documentId) {
+        ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).delete();
     }
 
     public List<T> getAll() throws ExecutionException, InterruptedException {
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = collectionReference.get();
         List<QueryDocumentSnapshot> queryDocumentSnapshots = querySnapshotApiFuture.get().getDocuments();
 
-        return queryDocumentSnapshots.stream()
-                .map(queryDocumentSnapshot -> queryDocumentSnapshot.toObject(parameterizedType))
-                .collect(Collectors.toList());
+        List<T> tList = new ArrayList<>();
 
+        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+            T obj = doc.toObject(parameterizedType);
+            obj.setDocumentId(doc.getId());
+            tList.add(obj);
+        }
+
+        return tList;
     }
 
     public Optional<T> getById(String documentId) throws ExecutionException, InterruptedException {
