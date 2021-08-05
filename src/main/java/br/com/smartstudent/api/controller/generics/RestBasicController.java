@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 public class RestBasicController<T extends AbstractModel> {
 
@@ -24,12 +25,12 @@ public class RestBasicController<T extends AbstractModel> {
      * @return Return a list of all DTOs
      */
     @GetMapping(value = {"", "all"})
-    public List<T> getAll() {
+    public List<T> getAll() throws ExecutionException, InterruptedException {
         return this.basicService.getAll();
     }
 
     @GetMapping(value = "{id}")
-    public Optional<T> getById(@PathVariable("id") String id) {
+    public Optional<T> getById(@PathVariable("id") String id) throws ExecutionException, InterruptedException {
         return basicService.getById(id);
     }
 
@@ -52,7 +53,7 @@ public class RestBasicController<T extends AbstractModel> {
      * @return Response Entity
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<T> delete(@PathVariable String id) {
+    public ResponseEntity<T> delete(@PathVariable String id) throws ExecutionException, InterruptedException {
         T t = basicService.getById(id)
                 .orElseThrow(() -> new ValidationException(EnumException.ITEM_NAO_ENCONTRADO));
         basicService.deleteById(t.getDocumentId());
