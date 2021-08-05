@@ -21,6 +21,11 @@ public class ValidationException extends RuntimeException {
         this.httpStatus = exceptionEnum.getHttpStatus();
     }
 
+    public ValidationException(String message) {
+        this.description = message;
+        this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
     public ValidationException(String description, HttpStatus httpStatus) {
         this.description = description;
         this.httpStatus = httpStatus;
