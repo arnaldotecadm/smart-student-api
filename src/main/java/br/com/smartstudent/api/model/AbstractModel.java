@@ -1,5 +1,13 @@
 package br.com.smartstudent.api.model;
 
-public abstract class AbstractModel {
-    public abstract String getDocumentId();
+public class AbstractModel {
+    protected String documentId;
+
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
+    }
 }

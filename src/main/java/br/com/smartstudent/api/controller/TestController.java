@@ -36,7 +36,7 @@ public class TestController {
     @PostMapping
     public void saveEntry(){
         CollectionReference testList = firebase.getFirebase().collection("test");
-        testList.document("testes").set(new Student("Arnold"));
+        testList.add(new Student("Arnold"));
     }
 }
 
