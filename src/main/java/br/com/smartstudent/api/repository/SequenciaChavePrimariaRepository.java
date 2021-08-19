@@ -1,7 +1,6 @@
 package br.com.smartstudent.api.repository;
 
 import br.com.smartstudent.api.model.SequenciaChavePrimaria;
-import br.com.smartstudent.api.model.Turma;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
