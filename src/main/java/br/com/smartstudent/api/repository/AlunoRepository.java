@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 public class AlunoRepository extends AbstractFirebaseRepository<Aluno> {
 
     protected AlunoRepository(Firestore firestore) {
-        super(firestore, "User");
+        super(firestore, "aluno");
     }
 
 }

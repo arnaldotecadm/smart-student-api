@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Calendar;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -14,6 +12,17 @@ import java.util.Calendar;
 public class Aluno extends AbstractModel{
 
     private String nome;
-    private Calendar datanascimento;
+    private String descricao;
+    private String cep;
+    private String tipoCep;
+    private String endereco;
+    private String numero;
+    private String uf;
+    private String bairro;
+    private String cidade;
+    private String complemento;
+    private String telefone;
+    private String contato;
+    private String email;
 
 }
