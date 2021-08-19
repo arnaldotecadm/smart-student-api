@@ -12,11 +12,17 @@ import java.util.concurrent.ExecutionException;
 
 public class AbstractFirebaseRepository<T extends AbstractModel> {
 
-    private final CollectionReference collectionReference;
+    protected final CollectionReference collectionReference;
 
     private final Class<T> parameterizedType;
+    private String collection;
+
+    public String getCollection() {
+        return collection;
+    }
 
     protected AbstractFirebaseRepository(Firestore firestore, String collection) {
+        this.collection = collection;
         this.collectionReference = firestore.collection(collection);
         this.parameterizedType = getParameterizedType();
     }

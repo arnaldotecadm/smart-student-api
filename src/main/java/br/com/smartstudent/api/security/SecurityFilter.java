@@ -1,5 +1,7 @@
 package br.com.smartstudent.api.security;
 
+import br.com.smartstudent.api.enums.EnumException;
+import br.com.smartstudent.api.exception.ValidationException;
 import br.com.smartstudent.api.security.model.Credentials;
 import br.com.smartstudent.api.security.model.SecurityProperties;
 import br.com.smartstudent.api.security.model.User;
@@ -64,6 +66,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         } catch (FirebaseAuthException e) {
             e.printStackTrace();
             log.error("Firebase Exception:: ", e.getLocalizedMessage());
+            throw new ValidationException(EnumException.ACESSO_NAO_PERMITIDO);
         }
         User user = firebaseTokenToUserDto(decodedToken);
         if (user != null) {

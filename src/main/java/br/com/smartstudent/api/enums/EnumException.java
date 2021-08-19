@@ -6,7 +6,8 @@ import java.util.stream.Stream;
 
 public enum EnumException {
 
-	ITEM_NAO_ENCONTRADO(HttpStatus.NOT_FOUND, "O recurso solicitado nao esta disponivel no servidor");
+	ITEM_NAO_ENCONTRADO(HttpStatus.NOT_FOUND, "O recurso solicitado nao esta disponivel no servidor"),
+	ACESSO_NAO_PERMITIDO(HttpStatus.UNAUTHORIZED, "O acesso ao recuso solicitado não está permitido.");
 
     private final HttpStatus httpStatus;
 	private final String descricao;

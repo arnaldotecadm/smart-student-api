@@ -1,5 +1,7 @@
 package br.com.smartstudent.api.service;
 
+import br.com.smartstudent.api.repository.AbstractFirebaseRepository;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -18,4 +20,6 @@ public interface RestBasicService<T> {
     T save(T t);
 
     void deleteById(String id);
+
+    AbstractFirebaseRepository getRespository();
 }
