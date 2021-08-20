@@ -44,4 +44,8 @@ public class AlunoService implements RestBasicService<Aluno>{
     public AbstractFirebaseRepository getRespository() {
         return repository;
     }
+
+    public List<Aluno> getAlunosByTurma(String turmaId) throws ExecutionException, InterruptedException {
+        return this.repository.getAlunosByTurma(turmaId);
+    }
 }
