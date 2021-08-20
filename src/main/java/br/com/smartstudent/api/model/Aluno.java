@@ -13,6 +13,8 @@ public class Aluno extends AbstractModel{
 
     private String nome;
     private String descricao;
+    private String matricula;
+    private String cpf;
     private String cep;
     private String tipoCep;
     private String endereco;
