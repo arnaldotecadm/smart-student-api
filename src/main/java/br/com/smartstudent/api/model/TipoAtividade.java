@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Atividade extends AbstractModel{
+public class TipoAtividade extends AbstractModel{
 
     private String nome;
     private String descricao;

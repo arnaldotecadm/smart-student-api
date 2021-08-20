@@ -1,10 +1,8 @@
 package br.com.smartstudent.api.service;
 
-import br.com.smartstudent.api.model.Atividade;
-import br.com.smartstudent.api.model.Turma;
+import br.com.smartstudent.api.model.TipoAtividade;
 import br.com.smartstudent.api.repository.AbstractFirebaseRepository;
-import br.com.smartstudent.api.repository.AtividadeRepository;
-import br.com.smartstudent.api.repository.TurmaRepository;
+import br.com.smartstudent.api.repository.TipoAtividadeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,27 +11,27 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class AtividadeService implements RestBasicService<Atividade>{
+public class TipoAtividadeService implements RestBasicService<TipoAtividade>{
 
-    private final AtividadeRepository repository;
+    private final TipoAtividadeRepository repository;
 
     @Autowired
-    public AtividadeService(AtividadeRepository repository){
+    public TipoAtividadeService(TipoAtividadeRepository repository){
         this.repository = repository;
     }
 
     @Override
-    public List<Atividade> getAll() throws ExecutionException, InterruptedException {
+    public List<TipoAtividade> getAll() throws ExecutionException, InterruptedException {
         return this.repository.getAll();
     }
 
     @Override
-    public Optional<Atividade> getById(String id) throws ExecutionException, InterruptedException {
+    public Optional<TipoAtividade> getById(String id) throws ExecutionException, InterruptedException {
         return this.repository.getById(id);
     }
 
     @Override
-    public Atividade save(Atividade t) {
+    public TipoAtividade save(TipoAtividade t) {
         return this.repository.save(t);
     }
 

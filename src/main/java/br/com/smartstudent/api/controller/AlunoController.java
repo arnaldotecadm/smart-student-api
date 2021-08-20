@@ -23,7 +23,7 @@ public class AlunoController extends RestBasicController<Aluno> {
     }
 
     @GetMapping("aluno-por-turma/{turmaId}")
-    public List<Aluno> getAlunosByTurma(@PathVariable("turmaId") String turmaId) throws ExecutionException, InterruptedException {
+    public List<Aluno> getAlunosPorTurma(@PathVariable("turmaId") String turmaId) throws ExecutionException, InterruptedException {
         return this.service.getAlunosByTurma(turmaId);
     }
 }
