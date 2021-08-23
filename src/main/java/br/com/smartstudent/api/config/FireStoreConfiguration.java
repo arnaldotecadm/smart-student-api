@@ -2,6 +2,7 @@ package br.com.smartstudent.api.config;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.storage.StorageOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
@@ -22,9 +23,19 @@ public class FireStoreConfiguration {
     @Value("${firebase.database.url}")
     String databaseUrl;
 
+    @Value("${firebase.project.id}")
+    String projectId;
+
+    private StorageOptions storageOptions;
+
     @Bean
     public Firestore getFirestore() {
         return FirestoreClient.getFirestore();
+    }
+
+    @Bean
+    public StorageOptions getStorageOptions(){
+        return this.storageOptions;
     }
 
     @PostConstruct
@@ -35,6 +46,11 @@ public class FireStoreConfiguration {
                 .setCredentials(credentials)
                 .setDatabaseUrl(databaseUrl)
                 .build();
+
+        this.storageOptions = StorageOptions.newBuilder()
+                .setProjectId(projectId)
+                .setCredentials(GoogleCredentials.fromStream(getClass().getClassLoader().getResourceAsStream(credentialPath))).build();
+
         FirebaseApp.initializeApp(options);
     }
 }
