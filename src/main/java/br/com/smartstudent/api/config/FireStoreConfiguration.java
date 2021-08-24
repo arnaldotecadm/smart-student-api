@@ -1,12 +1,12 @@
 package br.com.smartstudent.api.config;
 
+import br.com.smartstudent.api.model.ApplicationProperties;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.storage.StorageOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,14 +17,11 @@ import java.io.InputStream;
 @Configuration
 public class FireStoreConfiguration {
 
-    @Value("${firebase.credential.path}")
-    String credentialPath;
+    private ApplicationProperties properties;
 
-    @Value("${firebase.database.url}")
-    String databaseUrl;
-
-    @Value("${firebase.project.id}")
-    String projectId;
+    public FireStoreConfiguration(ApplicationProperties properties) {
+        this.properties = properties;
+    }
 
     private StorageOptions storageOptions;
 
@@ -34,22 +31,22 @@ public class FireStoreConfiguration {
     }
 
     @Bean
-    public StorageOptions getStorageOptions(){
+    public StorageOptions getStorageOptions() {
         return this.storageOptions;
     }
 
     @PostConstruct
     public void initializeFrebase() throws IOException {
-        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream(credentialPath);
+        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream(properties.getCredentialPath());
         GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(credentials)
-                .setDatabaseUrl(databaseUrl)
+                .setDatabaseUrl(properties.getDatabaseUrl())
                 .build();
 
         this.storageOptions = StorageOptions.newBuilder()
-                .setProjectId(projectId)
-                .setCredentials(GoogleCredentials.fromStream(getClass().getClassLoader().getResourceAsStream(credentialPath))).build();
+                .setProjectId(properties.getProjectId())
+                .setCredentials(GoogleCredentials.fromStream(getClass().getClassLoader().getResourceAsStream(properties.getCredentialPath()))).build();
 
         FirebaseApp.initializeApp(options);
     }
