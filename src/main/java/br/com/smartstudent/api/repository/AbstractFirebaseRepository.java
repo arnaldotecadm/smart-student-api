@@ -13,10 +13,8 @@ import java.util.concurrent.ExecutionException;
 public class AbstractFirebaseRepository<T extends AbstractModel> {
 
     protected final CollectionReference collectionReference;
-
     private final Class<T> parameterizedType;
     private String collection;
-
     public String getCollection() {
         return collection;
     }
@@ -35,22 +33,19 @@ public class AbstractFirebaseRepository<T extends AbstractModel> {
     public T save(T model) {
         String documentId = model.getDocumentId();
         ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).set(model);
+        waitProcessToBeFinished(resultApiFuture);
         return model;
-    }
-
-    public void delete(T model) {
-        String documentId = model.getDocumentId();
-        ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).delete();
     }
 
     public void deleteById(String documentId) {
         ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).delete();
+        waitProcessToBeFinished(resultApiFuture);
     }
 
     public List<T> getAll() throws ExecutionException, InterruptedException {
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = collectionReference.get();
-        List<QueryDocumentSnapshot> queryDocumentSnapshots = querySnapshotApiFuture.get().getDocuments();
-
+        Query orderBy = querySnapshotApiFuture.get().getQuery().orderBy("id");
+        List<QueryDocumentSnapshot> queryDocumentSnapshots = orderBy.get().get().getDocuments();
         List<T> tList = new ArrayList<>();
 
         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
@@ -75,4 +70,14 @@ public class AbstractFirebaseRepository<T extends AbstractModel> {
         return Optional.empty();
     }
 
+    private void waitProcessToBeFinished(ApiFuture<WriteResult> resultApiFuture) {
+        while(!resultApiFuture.isDone()){
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
 }

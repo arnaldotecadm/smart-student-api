@@ -1,5 +1,6 @@
 package br.com.smartstudent.api.model;
 
+import br.com.smartstudent.api.enums.FeatureStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,13 +10,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Atividade extends AbstractModel{
+public class Feature extends AbstractModel{
 
     private String nome;
     private String descricao;
-    private String tipoAtividade;
-    private String materia;
-    private String professor;
-    private String turma;
-    private Double notaMaxima;
+    private FeatureStatusEnum featureStatusEnum;
 }
