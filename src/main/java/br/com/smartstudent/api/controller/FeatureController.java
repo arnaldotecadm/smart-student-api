@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class FeatureController extends RestBasicController<Feature> {
     @GetMapping(value = {"", "all"})
     public List<Feature> getAll() throws ExecutionException, InterruptedException {
         List<Feature> all = super.getAll();
-        return all.stream().filter(item -> item.getFeatureStatusEnum() != FeatureStatusEnum.DONE).collect(Collectors.toList());
+        return all.stream().filter(item -> Arrays.asList(null,FeatureStatusEnum.CREATED, FeatureStatusEnum.IN_PROGRESS).contains(item.getFeatureStatusEnum())).collect(Collectors.toList());
     }
 
     @Override
