@@ -14,5 +14,5 @@ public class Feature extends AbstractModel{
 
     private String nome;
     private String descricao;
-    private FeatureStatusEnum featureStatusEnum;
+    private FeatureStatusEnum featureStatusEnum = FeatureStatusEnum.CREATED;
 }

@@ -27,5 +27,5 @@ public class Aluno extends AbstractModel{
     private String telefone;
     private String contato;
     private String email;
-
+    private boolean ativo;
 }

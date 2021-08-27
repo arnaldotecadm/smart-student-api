@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("feature")
@@ -20,6 +22,12 @@ public class FeatureController extends RestBasicController<Feature> {
     @Autowired
     public FeatureController(FeatureService basicService) {
         super(basicService);
+    }
+
+    @GetMapping(value = {"", "all"})
+    public List<Feature> getAll() throws ExecutionException, InterruptedException {
+        List<Feature> all = super.getAll();
+        return all.stream().filter(item -> item.getFeatureStatusEnum() != FeatureStatusEnum.DONE).collect(Collectors.toList());
     }
 
     @Override
