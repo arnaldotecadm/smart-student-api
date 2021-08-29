@@ -1,12 +1,15 @@
 package br.com.smartstudent.api.controller;
 
 import br.com.smartstudent.api.controller.generics.RestBasicController;
+import br.com.smartstudent.api.model.CalendarioProfessor;
 import br.com.smartstudent.api.model.CalendarioTurma;
 import br.com.smartstudent.api.service.CalendarioTurmaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("calendario-turma")
@@ -16,5 +19,11 @@ public class CalendarioTurmaController extends RestBasicController<CalendarioTur
     @Autowired
     public CalendarioTurmaController(CalendarioTurmaService basicService) {
         super(basicService);
+    }
+
+    @GetMapping(value = "all/{documentId}")
+    public List<CalendarioTurma> getAll(@PathVariable("documentId") String documentId) throws ExecutionException, InterruptedException {
+        List<CalendarioTurma> listagem = super.getAll();
+        return listagem.stream().filter(item -> item.getTurma().equals(documentId)).collect(Collectors.toList());
     }
 }

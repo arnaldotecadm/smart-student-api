@@ -20,7 +20,7 @@ public class CalendarioProfessorController extends RestBasicController<Calendari
         super(basicService);
     }
 
-    @GetMapping(value = "all/{documentoId}")
+    @GetMapping(value = "all/{documentId}")
     public List<CalendarioProfessor> getAll(@PathVariable("documentId") String documentId) throws ExecutionException, InterruptedException {
         List<CalendarioProfessor> professorList = super.getAll();
         return professorList.stream().filter(item -> item.getProfessor().equals(documentId)).collect(Collectors.toList());
