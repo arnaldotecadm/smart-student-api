@@ -1,5 +1,6 @@
 package br.com.smartstudent.api.model;
 
+import br.com.smartstudent.api.enums.StatusAprovacaoEnum;
 import br.com.smartstudent.api.enums.TipoUsuarioEnum;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -22,6 +23,7 @@ public class Usuario extends AbstractModel implements Serializable {
     private String picture;
     private boolean ativo;
     private TipoUsuarioEnum tipoUsuarioEnum;
+    private StatusAprovacaoEnum statusAprovacaoEnum;
 
     public Usuario(FirebaseToken firebaseToken) throws FirebaseAuthException {
         this.uid = firebaseToken.getUid();
