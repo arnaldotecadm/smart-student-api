@@ -4,7 +4,7 @@ import br.com.smartstudent.api.enums.EnumException;
 import br.com.smartstudent.api.exception.ValidationException;
 import br.com.smartstudent.api.security.model.Credentials;
 import br.com.smartstudent.api.security.model.SecurityProperties;
-import br.com.smartstudent.api.security.model.User;
+import br.com.smartstudent.api.model.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -73,7 +73,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             log.error("Firebase Exception:: ", e.getLocalizedMessage());
             throw new ValidationException(EnumException.ACESSO_NAO_PERMITIDO);
         }
-        User user = firebaseTokenToUserDto(decodedToken);
+        Usuario user = firebaseTokenToUserDto(decodedToken);
         if (user != null) {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,
                     new Credentials(type, decodedToken, token, session), null);
@@ -82,12 +82,12 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
     }
 
-    private User firebaseTokenToUserDto(FirebaseToken decodedToken) {
-        User user = null;
+    private Usuario firebaseTokenToUserDto(FirebaseToken decodedToken) {
+        Usuario user = null;
         if (decodedToken != null) {
-            user = new User();
+            user = new Usuario();
             user.setUid(decodedToken.getUid());
-            user.setName(decodedToken.getName());
+            user.setNome(decodedToken.getName());
             user.setEmail(decodedToken.getEmail());
             user.setPicture(decodedToken.getPicture());
             user.setIssuer(decodedToken.getIssuer());

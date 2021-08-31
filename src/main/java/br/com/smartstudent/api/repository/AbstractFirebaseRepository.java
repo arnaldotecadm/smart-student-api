@@ -1,8 +1,10 @@
 package br.com.smartstudent.api.repository;
 
 import br.com.smartstudent.api.model.AbstractModel;
+import br.com.smartstudent.api.model.Usuario;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -32,6 +34,9 @@ public class AbstractFirebaseRepository<T extends AbstractModel> {
 
     public T save(T model) {
         String documentId = model.getDocumentId();
+        Usuario usuario = ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        model.setUsuarioCriacao(usuario.getUid());
+
         ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).set(model);
         waitProcessToBeFinished(resultApiFuture);
         return model;

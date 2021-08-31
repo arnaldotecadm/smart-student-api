@@ -7,25 +7,13 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@Getter()
 @Setter
-public class Aluno extends AbstractModel{
+public class Aluno extends Pessoa {
 
-    private String nome;
-    private String descricao;
     private String matricula;
     private String cpf;
     private String turma;
-    private String cep;
-    private String tipoCep;
-    private String endereco;
-    private String numero;
-    private String uf;
-    private String bairro;
-    private String cidade;
-    private String complemento;
-    private String telefone;
     private String contato;
-    private String email;
-    private boolean ativo;
+
 }
