@@ -18,4 +18,5 @@ public abstract class Pessoa extends AbstractModel {
     private String telefone;
     private String email;
     private boolean ativo;
+    private String usuario;
 }

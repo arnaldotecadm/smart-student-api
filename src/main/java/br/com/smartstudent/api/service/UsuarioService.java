@@ -1,5 +1,8 @@
 package br.com.smartstudent.api.service;
 
+import br.com.smartstudent.api.enums.EnumException;
+import br.com.smartstudent.api.enums.StatusAprovacaoEnum;
+import br.com.smartstudent.api.exception.ValidationException;
 import br.com.smartstudent.api.model.Usuario;
 import br.com.smartstudent.api.repository.AbstractFirebaseRepository;
 import br.com.smartstudent.api.repository.UsuarioRepository;
@@ -45,4 +48,18 @@ public class UsuarioService implements RestBasicService<Usuario> {
         return repository;
     }
 
+    public boolean aprovarUsuario(String id) throws ExecutionException, InterruptedException {
+        return this.updateStatusUsuario(id, StatusAprovacaoEnum.APROVADO);
+    }
+
+    public boolean reprovarUsuario(String id) throws ExecutionException, InterruptedException {
+        return this.updateStatusUsuario(id, StatusAprovacaoEnum.REPROVADO);
+    }
+
+    private boolean updateStatusUsuario(String id, StatusAprovacaoEnum statusAprovacaoEnum) throws ExecutionException, InterruptedException {
+        Usuario usuario = this.getById(id).orElseThrow(() -> new ValidationException(EnumException.ITEM_NAO_ENCONTRADO));
+        usuario.setStatusAprovacaoEnum(statusAprovacaoEnum);
+        this.save(usuario);
+        return true;
+    }
 }
