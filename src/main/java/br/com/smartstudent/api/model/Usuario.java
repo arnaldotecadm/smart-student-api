@@ -32,7 +32,8 @@ public class Usuario extends AbstractModel implements Serializable {
         this.isEmailVerified = firebaseToken.isEmailVerified();
         this.issuer = firebaseToken.getIssuer();
         this.picture = firebaseToken.getPicture();
-        this.ativo = false;
+        this.ativo = true;
         this.tipoUsuarioEnum = TipoUsuarioEnum.VISITANTE;
+        this.statusAprovacaoEnum = StatusAprovacaoEnum.PENDENTE;
     }
 }

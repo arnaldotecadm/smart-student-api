@@ -7,6 +7,9 @@ import br.com.smartstudent.api.exception.ValidationException;
 import br.com.smartstudent.api.model.Usuario;
 import br.com.smartstudent.api.repository.AbstractFirebaseRepository;
 import br.com.smartstudent.api.repository.UsuarioRepository;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,11 +60,11 @@ public class UsuarioService implements RestBasicService<Usuario> {
         return this.updateStatusAprovacaoUsuario(id, StatusAprovacaoEnum.REPROVADO);
     }
 
-    public Usuario ativarUsuario(String id) throws ExecutionException, InterruptedException {
+    public Usuario ativarUsuario(String id) throws ExecutionException, InterruptedException, FirebaseAuthException {
         return this.updateStatusUsuario(id, true);
     }
 
-    public Usuario desativarUsuario(String id) throws ExecutionException, InterruptedException {
+    public Usuario desativarUsuario(String id) throws ExecutionException, InterruptedException, FirebaseAuthException {
         return this.updateStatusUsuario(id, false);
     }
 
@@ -80,9 +83,14 @@ public class UsuarioService implements RestBasicService<Usuario> {
         return true;
     }
 
-    private Usuario updateStatusUsuario(String id, boolean status) throws ExecutionException, InterruptedException {
+    private Usuario updateStatusUsuario(String id, boolean status) throws ExecutionException, InterruptedException, FirebaseAuthException {
         Usuario usuario = this.getById(id).orElseThrow(() -> new ValidationException(EnumException.ITEM_NAO_ENCONTRADO));
         usuario.setAtivo(status);
+
+        UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(usuario.getUid());
+        updateRequest.setDisabled(!status);
+        FirebaseAuth.getInstance().updateUser(updateRequest);
+
         return this.save(usuario);
     }
 

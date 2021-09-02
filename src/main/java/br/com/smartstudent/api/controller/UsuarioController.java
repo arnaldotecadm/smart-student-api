@@ -9,6 +9,7 @@ import br.com.smartstudent.api.service.UsuarioService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.google.firebase.auth.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,13 +71,13 @@ public class UsuarioController extends RestBasicController<Usuario> {
     }
 
     @PostMapping(value = {"ativar"})
-    public ResponseEntity<Usuario> ativarUsuario(@RequestBody String documentId) throws ExecutionException, InterruptedException {
+    public ResponseEntity<Usuario> ativarUsuario(@RequestBody String documentId) throws ExecutionException, InterruptedException, FirebaseAuthException {
         Usuario usuario = this.basicService.ativarUsuario(documentId);
         return ResponseEntity.ok(usuario);
     }
 
     @PostMapping(value = {"desativar"})
-    public ResponseEntity<Usuario> desativarUsuario(@RequestBody String documentId) throws ExecutionException, InterruptedException {
+    public ResponseEntity<Usuario> desativarUsuario(@RequestBody String documentId) throws ExecutionException, InterruptedException, FirebaseAuthException {
         Usuario usuario = this.basicService.desativarUsuario(documentId);
         return ResponseEntity.ok(usuario);
     }
