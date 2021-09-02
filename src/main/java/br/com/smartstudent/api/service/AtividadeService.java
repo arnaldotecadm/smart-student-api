@@ -1,6 +1,8 @@
 package br.com.smartstudent.api.service;
 
+import br.com.smartstudent.api.model.Aluno;
 import br.com.smartstudent.api.model.Atividade;
+import br.com.smartstudent.api.model.Professor;
 import br.com.smartstudent.api.model.Turma;
 import br.com.smartstudent.api.repository.AbstractFirebaseRepository;
 import br.com.smartstudent.api.repository.AtividadeRepository;
@@ -47,4 +49,7 @@ public class AtividadeService implements RestBasicService<Atividade>{
         return repository;
     }
 
+    public List<Atividade> getAtividadesByTurma(String turmaId) throws ExecutionException, InterruptedException {
+        return this.repository.getAtividadesByTurma(turmaId);
+    }
 }
