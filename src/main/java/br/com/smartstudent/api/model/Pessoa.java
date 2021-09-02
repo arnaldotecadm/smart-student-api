@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class Pessoa extends AbstractModel {
+public class Pessoa extends AbstractModel {
     private String nome;
     private String cep;
     private String tipoCep;

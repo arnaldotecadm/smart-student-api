@@ -47,4 +47,7 @@ public class ProfessorService implements RestBasicService<Professor>{
         return repository;
     }
 
+    public Optional<Professor> getByUsuario(String usuario) throws ExecutionException, InterruptedException {
+        return this.repository.getByUsuario(usuario);
+    }
 }

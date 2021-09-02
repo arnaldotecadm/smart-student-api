@@ -1,6 +1,7 @@
 package br.com.smartstudent.api.service;
 
 import br.com.smartstudent.api.model.Aluno;
+import br.com.smartstudent.api.model.Professor;
 import br.com.smartstudent.api.repository.AbstractFirebaseRepository;
 import br.com.smartstudent.api.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +48,9 @@ public class AlunoService implements RestBasicService<Aluno>{
 
     public List<Aluno> getAlunosByTurma(String turmaId) throws ExecutionException, InterruptedException {
         return this.repository.getAlunosByTurma(turmaId);
+    }
+
+    public Optional<Aluno> getByUsuario(String usuario) throws ExecutionException, InterruptedException {
+        return this.repository.getByUsuario(usuario);
     }
 }

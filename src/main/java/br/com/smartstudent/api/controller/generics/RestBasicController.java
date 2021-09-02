@@ -65,9 +65,12 @@ public class RestBasicController<T extends AbstractModel> {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    private void setIdentifier(T t) throws ExecutionException, InterruptedException {
+    public void setIdentifier(AbstractModel t) throws ExecutionException, InterruptedException {
         String collectionName = this.basicService.getRespository().getCollection();
+        setIdentifier(t, collectionName);
+    }
 
+    public void setIdentifier(AbstractModel t, String collectionName) throws ExecutionException, InterruptedException {
         List<SequenciaChavePrimaria> lastKey = this.chavePrimariaService.getLastKey(collectionName);
 
         if(lastKey.isEmpty()){

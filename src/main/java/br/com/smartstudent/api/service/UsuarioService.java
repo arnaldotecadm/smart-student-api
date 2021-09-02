@@ -2,6 +2,7 @@ package br.com.smartstudent.api.service;
 
 import br.com.smartstudent.api.enums.EnumException;
 import br.com.smartstudent.api.enums.StatusAprovacaoEnum;
+import br.com.smartstudent.api.enums.TipoUsuarioEnum;
 import br.com.smartstudent.api.exception.ValidationException;
 import br.com.smartstudent.api.model.Usuario;
 import br.com.smartstudent.api.repository.AbstractFirebaseRepository;
@@ -49,17 +50,45 @@ public class UsuarioService implements RestBasicService<Usuario> {
     }
 
     public boolean aprovarUsuario(String id) throws ExecutionException, InterruptedException {
-        return this.updateStatusUsuario(id, StatusAprovacaoEnum.APROVADO);
+        return this.updateStatusAprovacaoUsuario(id, StatusAprovacaoEnum.APROVADO);
     }
 
     public boolean reprovarUsuario(String id) throws ExecutionException, InterruptedException {
-        return this.updateStatusUsuario(id, StatusAprovacaoEnum.REPROVADO);
+        return this.updateStatusAprovacaoUsuario(id, StatusAprovacaoEnum.REPROVADO);
     }
 
-    private boolean updateStatusUsuario(String id, StatusAprovacaoEnum statusAprovacaoEnum) throws ExecutionException, InterruptedException {
+    public Usuario ativarUsuario(String id) throws ExecutionException, InterruptedException {
+        return this.updateStatusUsuario(id, true);
+    }
+
+    public Usuario desativarUsuario(String id) throws ExecutionException, InterruptedException {
+        return this.updateStatusUsuario(id, false);
+    }
+
+    public Usuario definirComoAluno(Usuario usuario) throws ExecutionException, InterruptedException {
+        return this.updateTipoUsuario(usuario.getDocumentId(), TipoUsuarioEnum.ALUNO);
+    }
+
+    public Usuario definirComoProfessor(Usuario usuario) throws ExecutionException, InterruptedException {
+        return this.updateTipoUsuario(usuario.getDocumentId(), TipoUsuarioEnum.PROFESSOR);
+    }
+
+    private boolean updateStatusAprovacaoUsuario(String id, StatusAprovacaoEnum statusAprovacaoEnum) throws ExecutionException, InterruptedException {
         Usuario usuario = this.getById(id).orElseThrow(() -> new ValidationException(EnumException.ITEM_NAO_ENCONTRADO));
         usuario.setStatusAprovacaoEnum(statusAprovacaoEnum);
         this.save(usuario);
         return true;
+    }
+
+    private Usuario updateStatusUsuario(String id, boolean status) throws ExecutionException, InterruptedException {
+        Usuario usuario = this.getById(id).orElseThrow(() -> new ValidationException(EnumException.ITEM_NAO_ENCONTRADO));
+        usuario.setAtivo(status);
+        return this.save(usuario);
+    }
+
+    private Usuario updateTipoUsuario(String id, TipoUsuarioEnum tipoUsuarioEnum) throws ExecutionException, InterruptedException {
+        Usuario usuario = this.getById(id).orElseThrow(() -> new ValidationException(EnumException.ITEM_NAO_ENCONTRADO));
+        usuario.setTipoUsuarioEnum(tipoUsuarioEnum);
+        return this.save(usuario);
     }
 }
