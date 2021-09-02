@@ -1,5 +1,6 @@
 package br.com.smartstudent.api.service;
 
+import br.com.smartstudent.api.enums.StatusAtividadeEnum;
 import br.com.smartstudent.api.model.Aluno;
 import br.com.smartstudent.api.model.Atividade;
 import br.com.smartstudent.api.model.Professor;
@@ -51,5 +52,23 @@ public class AtividadeService implements RestBasicService<Atividade>{
 
     public List<Atividade> getAtividadesByTurma(String turmaId) throws ExecutionException, InterruptedException {
         return this.repository.getAtividadesByTurma(turmaId);
+    }
+
+    public Atividade disponibilizarAtividade(String atividadeId) throws ExecutionException, InterruptedException {
+        return this.setStatusAtividade(atividadeId, StatusAtividadeEnum.DISPONIBILIZADA);
+    }
+
+    public Atividade indisponibilizarAtividade(String atividadeId) throws ExecutionException, InterruptedException {
+        return this.setStatusAtividade(atividadeId, StatusAtividadeEnum.INDISPONIBILIZADA);
+    }
+
+    private Atividade setStatusAtividade(String atividadeId, StatusAtividadeEnum statusAtividadeEnum) throws ExecutionException, InterruptedException {
+        Optional<Atividade> byId = this.getById(atividadeId);
+        if(byId.isPresent()){
+            byId.get().setStatusAtividadeEnum(statusAtividadeEnum);
+            Atividade save = this.save(byId.get());
+            return save;
+        }
+        return null;
     }
 }

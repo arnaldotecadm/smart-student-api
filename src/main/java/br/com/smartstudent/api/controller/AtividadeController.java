@@ -29,4 +29,14 @@ public class AtividadeController extends RestBasicController<Atividade> {
     public List<Atividade> getAtividadesByTurma(@PathVariable("turmaId") String turmaId) throws ExecutionException, InterruptedException {
         return this.service.getAtividadesByTurma(turmaId);
     }
+
+    @PostMapping("disponibilizar")
+    public Atividade disponibilizarAtividade(@RequestBody String turmaId) throws ExecutionException, InterruptedException {
+        return this.service.disponibilizarAtividade(turmaId);
+    }
+
+    @PostMapping("indisponibilizar")
+    public Atividade indisponibilizarAtividade(@RequestBody String turmaId) throws ExecutionException, InterruptedException {
+        return this.service.indisponibilizarAtividade(turmaId);
+    }
 }
