@@ -3,6 +3,7 @@ package br.com.smartstudent.api.controller;
 import br.com.smartstudent.api.model.ApplicationProperties;
 import br.com.smartstudent.api.model.FileUploadResponseDTO;
 import br.com.smartstudent.api.model.StringResponse;
+import br.com.smartstudent.api.model.Usuario;
 import com.google.api.gax.paging.Page;
 import com.google.cloud.ReadChannel;
 import com.google.cloud.storage.*;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +39,7 @@ public class UploadController {
 
     @GetMapping("/all")
     public List getAll() {
-        return getFiles(null,null);
+        return getFiles(null, null);
     }
 
     @GetMapping("/all/{tipoMaterial}/{atividadeId}")
@@ -55,8 +57,18 @@ public class UploadController {
         Storage.BlobListOption upload = null;
         Page<Blob> list = null;
 
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int indiceNome = 3;
+        String folder;
+        if ("respostas-dos-alunos".equals(tipoMaterial)) {
+            folder = String.format("atividades/%s/%s/%s", atividadeId, tipoMaterial, usuario.getUid());
+            indiceNome = 4;
+        } else {
+            folder = String.format("atividades/%s/%s", atividadeId, tipoMaterial);
+        }
+
         if (null != atividadeId) {
-            upload = Storage.BlobListOption.prefix(String.format("atividades/%s/%s", atividadeId, tipoMaterial));
+            upload = Storage.BlobListOption.prefix(folder);
             list = bucket.list(upload);
         } else {
             list = bucket.list();
@@ -68,7 +80,7 @@ public class UploadController {
             FileUploadResponseDTO v2 = new FileUploadResponseDTO();
             v2.setId(split[1]);
             v2.setGravadoNaBase(true);
-            v2.setNomeArquivo(split[3]);
+            v2.setNomeArquivo(split[indiceNome]);
             v2.setTamanhoArquivo(blob.getSize());
 
             v2List.add(v2);
@@ -84,7 +96,16 @@ public class UploadController {
 
         byte[] arquivo = file.getBytes();
 
-        BlobId blobId = BlobId.of(properties.getBucketName(), String.format("atividades/%s/%s/%s", atividadeUUID, tipoMaterial, file.getOriginalFilename()));
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String folder;
+        if ("respostas-dos-alunos".equals(tipoMaterial)) {
+            folder = String.format("atividades/%s/%s/%s/%s", atividadeUUID, tipoMaterial, usuario.getUid(), file.getOriginalFilename());
+        } else {
+            folder = String.format("atividades/%s/%s/%s", atividadeUUID, tipoMaterial, file.getOriginalFilename());
+        }
+
+        BlobId blobId = BlobId.of(properties.getBucketName(), folder);
 
         Storage storage = storageOptions.getService();
 
@@ -103,7 +124,16 @@ public class UploadController {
             @PathVariable("nomeDocumento") String nomeDocumento) throws Exception {
         Storage storage = storageOptions.getService();
 
-        Blob blob = storage.get(BlobId.of(properties.getBucketName(), String.format("atividades/%s/%s/%s", atividadeId, tipoMaterial, nomeDocumento)));
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String folder;
+        if ("respostas-dos-alunos".equals(tipoMaterial)) {
+            folder = String.format("atividades/%s/%s/%s/%s", atividadeId, tipoMaterial, usuario.getUid(), nomeDocumento);
+        } else {
+            folder = String.format("atividades/%s/%s/%s", atividadeId, tipoMaterial, nomeDocumento);
+        }
+
+        Blob blob = storage.get(BlobId.of(properties.getBucketName(), folder));
         ReadChannel reader = blob.reader();
         InputStream inputStream = Channels.newInputStream(reader);
 
