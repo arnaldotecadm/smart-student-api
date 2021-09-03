@@ -53,4 +53,5 @@ public class AlunoService implements RestBasicService<Aluno>{
     public Optional<Aluno> getByUsuario(String usuario) throws ExecutionException, InterruptedException {
         return this.repository.getByUsuario(usuario);
     }
+
 }
