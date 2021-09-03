@@ -37,15 +37,18 @@ public class UploadController {
 
     @GetMapping("/all")
     public List getAll() {
-        return getFiles(null);
+        return getFiles(null,null);
     }
 
-    @GetMapping("/all/{atividadeId}")
-    public List getAllByAtividade(@PathVariable("atividadeId") String atividadeId) {
-        return getFiles(atividadeId);
+    @GetMapping("/all/{tipoMaterial}/{atividadeId}")
+    public List getAllByAtividade(
+            @PathVariable("tipoMaterial") String tipoMaterial,
+            @PathVariable("atividadeId") String atividadeId
+    ) {
+        return getFiles(tipoMaterial, atividadeId);
     }
 
-    private List getFiles(String atividadeId) {
+    private List getFiles(String tipoMaterial, String atividadeId) {
         Storage storage = storageOptions.getService();
         Bucket bucket = storage.get(properties.getBucketName());
 
@@ -53,7 +56,7 @@ public class UploadController {
         Page<Blob> list = null;
 
         if (null != atividadeId) {
-            upload = Storage.BlobListOption.prefix(atividadeId);
+            upload = Storage.BlobListOption.prefix(String.format("atividades/%s/%s", atividadeId, tipoMaterial));
             list = bucket.list(upload);
         } else {
             list = bucket.list();
@@ -63,9 +66,9 @@ public class UploadController {
         for (Blob blob : list.iterateAll()) {
             String[] split = blob.getName().split("/");
             FileUploadResponseDTO v2 = new FileUploadResponseDTO();
-            v2.setId(split[0]);
+            v2.setId(split[1]);
             v2.setGravadoNaBase(true);
-            v2.setNomeArquivo(split[1]);
+            v2.setNomeArquivo(split[3]);
             v2.setTamanhoArquivo(blob.getSize());
 
             v2List.add(v2);
@@ -76,11 +79,12 @@ public class UploadController {
 
     @PostMapping(path = "/add")
     public ResponseEntity<StringResponse> save(@RequestParam("file") MultipartFile file,
+                                               @RequestParam("tipoMaterial") String tipoMaterial,
                                                @RequestParam("atividadeUUID") String atividadeUUID) throws ParseException, IOException {
 
         byte[] arquivo = file.getBytes();
 
-        BlobId blobId = BlobId.of(properties.getBucketName(), String.format("%s/%s", atividadeUUID, file.getOriginalFilename()));
+        BlobId blobId = BlobId.of(properties.getBucketName(), String.format("atividades/%s/%s/%s", atividadeUUID, tipoMaterial, file.getOriginalFilename()));
 
         Storage storage = storageOptions.getService();
 
@@ -92,11 +96,14 @@ public class UploadController {
 
     }
 
-    @GetMapping("download/{atividadeId}/{nomeDocumento}")
-    public ResponseEntity<Object> downloadFile(@PathVariable("atividadeId") String atividadeId, @PathVariable("nomeDocumento") String nomeDocumento) throws Exception {
+    @GetMapping("download/{tipoMaterial}/{atividadeId}/{nomeDocumento}")
+    public ResponseEntity<Object> downloadFile(
+            @PathVariable("tipoMaterial") String tipoMaterial,
+            @PathVariable("atividadeId") String atividadeId,
+            @PathVariable("nomeDocumento") String nomeDocumento) throws Exception {
         Storage storage = storageOptions.getService();
 
-        Blob blob = storage.get(BlobId.of(properties.getBucketName(), String.format("%s/%s", atividadeId, nomeDocumento)));
+        Blob blob = storage.get(BlobId.of(properties.getBucketName(), String.format("atividades/%s/%s/%s", atividadeId, tipoMaterial, nomeDocumento)));
         ReadChannel reader = blob.reader();
         InputStream inputStream = Channels.newInputStream(reader);
 
