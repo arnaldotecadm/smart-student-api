@@ -17,10 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.Channels;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -28,6 +25,8 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping(path = "upload")
 public class UploadController {
 
+    public static final String RESPOSTAS_DOS_ALUNOS = "respostas-dos-alunos";
+    public static final String ATIVIDADES_FORMAT = "atividades/%s/%s/%s/%s";
     private StorageOptions storageOptions;
     private ApplicationProperties properties;
     private AlunoService alunoService;
@@ -40,19 +39,19 @@ public class UploadController {
     }
 
     @GetMapping("/all")
-    public List getAll() {
+    public List<FileUploadResponseDTO> getAll() {
         return getFiles(null, null);
     }
 
     @GetMapping("/all/{tipoMaterial}/{atividadeId}")
-    public List getAllByAtividade(
+    public List<FileUploadResponseDTO> getAllByAtividade(
             @PathVariable("tipoMaterial") String tipoMaterial,
             @PathVariable("atividadeId") String atividadeId
     ) {
         return getFiles(tipoMaterial, atividadeId);
     }
 
-    private List getFiles(String tipoMaterial, String atividadeId) {
+    private List<FileUploadResponseDTO> getFiles(String tipoMaterial, String atividadeId) {
         Storage storage = storageOptions.getService();
         Bucket bucket = storage.get(properties.getBucketName());
 
@@ -62,7 +61,7 @@ public class UploadController {
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int indiceNome = 3;
         String folder;
-        if ("respostas-dos-alunos".equals(tipoMaterial)) {
+        if (RESPOSTAS_DOS_ALUNOS.equals(tipoMaterial)) {
             folder = String.format("atividades/%s/%s/%s", atividadeId, tipoMaterial, usuario.getUid());
             indiceNome = 4;
         } else {
@@ -94,15 +93,15 @@ public class UploadController {
     @PostMapping(path = "/add")
     public ResponseEntity<StringResponse> save(@RequestParam("file") MultipartFile file,
                                                @RequestParam("tipoMaterial") String tipoMaterial,
-                                               @RequestParam("atividadeUUID") String atividadeUUID) throws ParseException, IOException {
+                                               @RequestParam("atividadeUUID") String atividadeUUID) throws IOException {
 
         byte[] arquivo = file.getBytes();
 
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String folder;
-        if ("respostas-dos-alunos".equals(tipoMaterial)) {
-            folder = String.format("atividades/%s/%s/%s/%s", atividadeUUID, tipoMaterial, usuario.getUid(), file.getOriginalFilename());
+        if (RESPOSTAS_DOS_ALUNOS.equals(tipoMaterial)) {
+            folder = String.format(ATIVIDADES_FORMAT, atividadeUUID, tipoMaterial, usuario.getUid(), file.getOriginalFilename());
         } else {
             folder = String.format("atividades/%s/%s/%s", atividadeUUID, tipoMaterial, file.getOriginalFilename());
         }
@@ -113,7 +112,7 @@ public class UploadController {
 
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
 
-        Blob blob = storage.create(blobInfo, arquivo);
+        storage.create(blobInfo, arquivo);
 
         return ResponseEntity.ok(new StringResponse("Registro salvo com sucesso!"));
 
@@ -121,8 +120,6 @@ public class UploadController {
 
     @GetMapping(path = "/atividades-submetidas-alunos/{atividadeId}")
     public ResponseEntity<Object> getAlunosJaSubmeteramMaterial(@PathVariable("atividadeId") String atividadeId) throws ExecutionException, InterruptedException {
-
-        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Storage storage = storageOptions.getService();
 
@@ -136,19 +133,18 @@ public class UploadController {
 
         upload = Storage.BlobListOption.prefix(folder);
 
-        list = bucket.list();
+        list = bucket.list(upload);
 
-        List<FileUploadResponseDTO> v2List = new ArrayList<>();
-        List<String> alunoUidList = new ArrayList<>();
+        Set<String> alunoUidList = new HashSet<>();
         for (Blob blob : list.iterateAll()) {
             String[] split = blob.getName().split("/");
             alunoUidList.add(split[3]);
         }
 
         List<Aluno> alunoList = new ArrayList<>();
-        for(String uid : alunoUidList){
-            Optional<Aluno> byId = this.alunoService.getById(uid);
-            if(byId.isPresent()){
+        for (String uid : alunoUidList) {
+            Optional<Aluno> byId = this.alunoService.getByUsuario(uid);
+            if (byId.isPresent()) {
                 alunoList.add(byId.get());
             }
         }
@@ -161,14 +157,14 @@ public class UploadController {
     public ResponseEntity<Object> downloadFile(
             @PathVariable("tipoMaterial") String tipoMaterial,
             @PathVariable("atividadeId") String atividadeId,
-            @PathVariable("nomeDocumento") String nomeDocumento) throws Exception {
+            @PathVariable("nomeDocumento") String nomeDocumento) throws IOException {
         Storage storage = storageOptions.getService();
 
         Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String folder;
-        if ("respostas-dos-alunos".equals(tipoMaterial)) {
-            folder = String.format("atividades/%s/%s/%s/%s", atividadeId, tipoMaterial, usuario.getUid(), nomeDocumento);
+        if (RESPOSTAS_DOS_ALUNOS.equals(tipoMaterial)) {
+            folder = String.format(ATIVIDADES_FORMAT, atividadeId, tipoMaterial, usuario.getUid(), nomeDocumento);
         } else {
             folder = String.format("atividades/%s/%s/%s", atividadeId, tipoMaterial, nomeDocumento);
         }
