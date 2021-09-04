@@ -1,9 +1,7 @@
 package br.com.smartstudent.api.controller;
 
-import br.com.smartstudent.api.model.ApplicationProperties;
-import br.com.smartstudent.api.model.FileUploadResponseDTO;
-import br.com.smartstudent.api.model.StringResponse;
-import br.com.smartstudent.api.model.Usuario;
+import br.com.smartstudent.api.model.*;
+import br.com.smartstudent.api.service.AlunoService;
 import com.google.api.gax.paging.Page;
 import com.google.cloud.ReadChannel;
 import com.google.cloud.storage.*;
@@ -22,6 +20,8 @@ import java.nio.channels.Channels;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @CrossOrigin()
@@ -30,11 +30,13 @@ public class UploadController {
 
     private StorageOptions storageOptions;
     private ApplicationProperties properties;
+    private AlunoService alunoService;
 
     @Autowired
-    public UploadController(StorageOptions storageOptions, ApplicationProperties properties) {
+    public UploadController(StorageOptions storageOptions, ApplicationProperties properties, AlunoService alunoService) {
         this.storageOptions = storageOptions;
         this.properties = properties;
+        this.alunoService = alunoService;
     }
 
     @GetMapping("/all")
@@ -114,6 +116,44 @@ public class UploadController {
         Blob blob = storage.create(blobInfo, arquivo);
 
         return ResponseEntity.ok(new StringResponse("Registro salvo com sucesso!"));
+
+    }
+
+    @GetMapping(path = "/atividades-submetidas-alunos/{atividadeId}")
+    public ResponseEntity<Object> getAlunosJaSubmeteramMaterial(@PathVariable("atividadeId") String atividadeId) throws ExecutionException, InterruptedException {
+
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Storage storage = storageOptions.getService();
+
+        Bucket bucket = storage.get(properties.getBucketName());
+
+        Storage.BlobListOption upload = null;
+
+        Page<Blob> list = null;
+
+        String folder = String.format("atividades/%s/respostas-dos-alunos", atividadeId);
+
+        upload = Storage.BlobListOption.prefix(folder);
+
+        list = bucket.list();
+
+        List<FileUploadResponseDTO> v2List = new ArrayList<>();
+        List<String> alunoUidList = new ArrayList<>();
+        for (Blob blob : list.iterateAll()) {
+            String[] split = blob.getName().split("/");
+            alunoUidList.add(split[3]);
+        }
+
+        List<Aluno> alunoList = new ArrayList<>();
+        for(String uid : alunoUidList){
+            Optional<Aluno> byId = this.alunoService.getById(uid);
+            if(byId.isPresent()){
+                alunoList.add(byId.get());
+            }
+        }
+
+        return ResponseEntity.ok(alunoList);
 
     }
 
