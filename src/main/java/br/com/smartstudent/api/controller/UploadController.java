@@ -40,7 +40,8 @@ public class UploadController {
 
     @GetMapping("/all")
     public List<FileUploadResponseDTO> getAll() {
-        return getFiles(null, null);
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return getFiles(null, null, usuario.getUid());
     }
 
     @GetMapping("/all/{tipoMaterial}/{atividadeId}")
@@ -48,21 +49,30 @@ public class UploadController {
             @PathVariable("tipoMaterial") String tipoMaterial,
             @PathVariable("atividadeId") String atividadeId
     ) {
-        return getFiles(tipoMaterial, atividadeId);
+        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return getFiles(tipoMaterial, atividadeId, usuario.getUid());
     }
 
-    private List<FileUploadResponseDTO> getFiles(String tipoMaterial, String atividadeId) {
+    @GetMapping("/all/{tipoMaterial}/{atividadeId}/{usuarioUid}")
+    public List<FileUploadResponseDTO> getAllByAtividadeAndUser(
+            @PathVariable("tipoMaterial") String tipoMaterial,
+            @PathVariable("atividadeId") String atividadeId,
+            @PathVariable("usuarioUid") String usuarioUid
+    ) {
+        return getFiles(tipoMaterial, atividadeId, usuarioUid);
+    }
+
+    private List<FileUploadResponseDTO> getFiles(String tipoMaterial, String atividadeId, String usuarioUid) {
         Storage storage = storageOptions.getService();
         Bucket bucket = storage.get(properties.getBucketName());
 
         Storage.BlobListOption upload = null;
         Page<Blob> list = null;
 
-        Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int indiceNome = 3;
         String folder;
         if (RESPOSTAS_DOS_ALUNOS.equals(tipoMaterial)) {
-            folder = String.format("atividades/%s/%s/%s", atividadeId, tipoMaterial, usuario.getUid());
+            folder = String.format("atividades/%s/%s/%s", atividadeId, tipoMaterial, usuarioUid);
             indiceNome = 4;
         } else {
             folder = String.format("atividades/%s/%s", atividadeId, tipoMaterial);
