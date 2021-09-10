@@ -28,6 +28,15 @@ public class ListaPresencaController extends RestBasicController<ListaPresenca> 
 
     @PostMapping("add-all-aluno")
     public ResponseEntity savePresenceList(@RequestBody ListaPresenca listaPresenca) throws ExecutionException, InterruptedException {
+        List<ListaPresenca> byTurma = this.basicService.getByTurma(listaPresenca.getTurma());
+        byTurma.stream().filter(item -> item.getData().equals(listaPresenca.getData()))
+                .forEach(lista -> {
+                    try {
+                        super.delete(lista.getDocumentId());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
         ResponseEntity<ListaPresenca> save = this.save(listaPresenca);
         return ResponseEntity.ok(save);
     }
