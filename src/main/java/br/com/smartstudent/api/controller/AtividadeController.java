@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +36,9 @@ public class AtividadeController extends RestBasicController<Atividade> {
 
     @GetMapping("atividades-por-turma/{turmaId}")
     public List<Atividade> getAtividadesByTurma(@PathVariable("turmaId") String turmaId) throws ExecutionException, InterruptedException {
-        return this.service.getAtividadesByTurma(turmaId);
+        List<Atividade> atividadesByTurma = this.service.getAtividadesByTurma(turmaId);
+        Collections.sort(atividadesByTurma, Comparator.comparingInt(Atividade::getOrdemApresentacao));
+        return atividadesByTurma;
     }
 
     @GetMapping("atividades-por-aluno")

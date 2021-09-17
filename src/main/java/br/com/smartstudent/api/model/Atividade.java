@@ -14,10 +14,13 @@ public class Atividade extends AbstractModel{
 
     private String nome;
     private String descricao;
+    private String abreviacao;
     private String tipoAtividade;
+    private boolean desconsiderarNotaMaxima;
     private String materia;
     private String professor;
     private String turma;
-    private Double notaMaxima;
+    private double notaMaxima;
     private StatusAtividadeEnum statusAtividadeEnum;
+    private int ordemApresentacao;
 }
